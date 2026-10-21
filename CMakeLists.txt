@@ -11,6 +11,8 @@ set(CMAKE_CXX_STANDARD 11)  # Other options: 98, 11, 14, 17, 20, 23
 # I guess this just downloads the library and uses it...
 # I modified the mumbo jumbo after 'GIT_TAG' to
 # the git commit hash of the latest release (https://github.com/whoshuu/cpr/releases/latest)
+set(CPR_FORCE_USE_SYSTEM_CURL ON CACHE BOOL "Use the maintained system libcurl and its TLS trust configuration")
+set(CPR_BUILD_TESTS OFF CACHE BOOL "Build CPR dependency tests")
 include(FetchContent)
 FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/whoshuu/cpr.git GIT_TAG f4622efcb59d84071ae11404ae61bd821c1c344b) # the commit hash for 1.5.0
 FetchContent_MakeAvailable(cpr)
@@ -21,6 +23,13 @@ add_executable(rrd main.cpp)
 
 # Link CPR to our executable
 target_link_libraries(rrd PRIVATE cpr::cpr)
+
+include(CTest)
+if(BUILD_TESTING)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_test(NAME cli COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_cli.py" "$<TARGET_FILE:rrd>")
+endif()
 
 # There's PRIVATE linking, PUBLIC linking, and INTERFACE linking
 # TL;DR:

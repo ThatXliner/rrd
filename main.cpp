@@ -11,7 +11,15 @@ int main(int argc, char const *argv[]) {
         std::cout << "Usage: rrd URL" << std::endl;
         return 1;
     }
-    cpr::Response r = cpr::Get(cpr::Url{argv[1]});
+    cpr::Response r = cpr::Get(cpr::Url{argv[1]}, cpr::Timeout{30000});
+    if (r.error) {
+        std::cerr << "Request failed: " << r.error.message << std::endl;
+        return 1;
+    }
+    if (r.status_code < 200 || r.status_code >= 300) {
+        std::cerr << "Request failed: HTTP " << r.status_code << std::endl;
+        return 1;
+    }
 
     if (std::regex_search(r.text, match, REGEX)) {
         std::cout << "Possible rickroll detected" << std::endl;
