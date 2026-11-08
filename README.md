@@ -88,19 +88,9 @@ cmake --build build
 
 Test `build/rrd` when using this build directory.
 
-### Verify HTTPS trust
+### HTTPS trust
 
-RRD uses CPR, which delegates HTTPS certificate verification to libcurl and its configured TLS backend and CA trust store. Keep that trust store and libcurl current. A CPR update alone does not update certificate trust. See the [eMudhra incident guidance](https://emudhra.we-have-a-problem.com/) and [Cloudflare developer guidance](https://blog.cloudflare.com/emudhra-certificate-compromise/).
-
-After updating, build RRD again and test the actual executable:
-
-```bash
-./rrd https://dv-g3b-emudhra.we-have-a-problem.com/
-./rrd https://dv-g3b-aaa-emudhra.we-have-a-problem.com/
-./rrd https://example.com
-```
-
-Both eMudhra requests must exit with code 1 and report a certificate validation error. DNS failures and timeouts do not prove rejection. The example.com request must succeed. Results apply to the libcurl and trust configuration used by that build. Keep certificate verification enabled.
+RRD uses CPR, which delegates HTTPS certificate verification to libcurl and its configured TLS backend and CA trust store. Keep libcurl and that trust store current; a CPR update alone does not update certificate trust. Keep certificate verification enabled.
 
 RRD reports request errors and HTTP error responses on standard error and exits with code 1. It only prints a detection result after a successful HTTP response.
 
